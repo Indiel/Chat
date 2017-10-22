@@ -1,9 +1,83 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <link href="css/normalize.css" type="text/css" rel="stylesheet"> <!-- type не обязателен -->
-    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            background-color: #656565;
+            font-family: sans-serif;
+            font-size: 100%;
+            line-height: 1.15;
+        }
+        
+        h1 {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+        
+        button,
+        input,
+        textarea {
+            font-family: sans-serif;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+        }
+        
+        #wrapper {
+            margin: 30px auto;
+            width: 740px;
+            padding: 20px;
+            color: white;
+            background: linear-gradient(180deg, #410040, #9500C7);
+            border: 3px solid #353135;
+            border-radius: 8px;
+        }
+        
+        #msg-box {
+            height: 300px;
+            padding: 0 10px;
+            background-color: #656565;
+            border: 3px double #2F2B2F;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+        
+        #head {
+            text-align: center;
+        }
+        
+        #content {
+            margin: auto;
+            padding: 0 10px;
+            width: 600px;
+        }
+        
+        .fields {
+            background-color: #C4C4C4;
+            border: 3px double #2F2B2F;
+            border-radius: 8px;
+        }
+        
+        #send {
+            background: linear-gradient(180deg, white 30%, #C4C4C4 70%);
+            border: 3px double #2F2B2F;
+            border-radius: 8px;
+        }
+        
+        #send:hover {
+            background: linear-gradient(180deg, #AB11CC 20%, #410040 80%);
+            border: 3px double #BBACBB;
+            border-radius: 8px;
+        }
+        
+        #send:active {
+            background: linear-gradient(180deg, #E331E0 30%, #80007E 70%);
+            border: 3px double #D8C7D8;
+            border-radius: 8px;
+        }
+    </style>
     <title>Чат</title>
 </head>
 
@@ -13,20 +87,50 @@
             <h1 id="head">Чатик</h1>
         </header>
         <div id="content">
-            <div id="msg-box"></div>
-            <form action="formdata.php" method="POST" name="form">
-                <p><label>Введите Ваше имя:   <input type="text" name="name" size="20" maxlength="20" class="fields"></label></p>
-                <p><label for="text"></label></p>
-                <p><textarea name="text" cols="71" rows="3" id="text" class="fields">Введите текст...</textarea></p>
-                <p><input type="reset" name="reset" value="Очистить" class="buttons">
-                <input type="submit" name="submit" value="Отправить" class="buttons"></p>
-            </form>
+            <div id="msg-box">
+            </div>
+            <div id="form">
+                <p>
+                    <label>Введите Ваше имя:
+                        <input type="text" name="name" size="20" maxlength="20" autofocus="" id="name" class="fields">
+                    </label>
+                </p>
+                <p>
+                    <label for="text"></label>
+                </p>
+                <p>
+                    <textarea name="text" cols="71" rows="3" id="text" class="fields" placeholder="Введите сообщение..."></textarea>
+                </p>
+                <p>
+                    <input type="submit" name="submit" value="Отправить" id="send">
+                </p>
+            </div>
         </div>
-        <footer>
-
-        </footer>
     </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+        var socket = io();
+
+        document.querySelector('#send')
+            .addEventListener('click', function send(name, text) {
+                var name = document.querySelector('#name').value;
+                var text = document.querySelector('#text').value;
+                if (name && text) {
+                    socket.emit('message', name + ': ' + text);
+                    document.getElementById('text').value = '';
+                    document.getElementById('text').focus();
+                } else {
+                    alert("Вы не ввели имя или сообщение. Пожалуйста, попробуйте еще раз.");
+                };
+            });
+
+        socket.on('new message', function(msg) {
+            let p = document.createElement('p');
+            p.textContent = msg;
+            document.querySelector('#msg-box').appendChild(p);
+        });
+    </script>
 </body>
+
 </html>
-
-
